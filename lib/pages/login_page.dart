@@ -1,6 +1,8 @@
 import 'package:campus/components/my_button.dart';
 import 'package:campus/components/my_textfield.dart';
+import 'package:campus/components/show_message.dart';
 import 'package:campus/components/square_tile.dart';
+import 'package:campus/pages/forgot_pass_page.dart';
 import 'package:campus/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,29 +40,14 @@ class _LoginPageState extends State<LoginPage> {
           email: emailController.text.trim(),
           password: passwordController.text.trim());
 
-          //pop the loading circle
-          Navigator.pop(context);
-
+      //pop the loading circle
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      
-       //pop the loading circle
+      //pop the loading circle
       Navigator.pop(context);
       //show error message
-      showErrorMessage(e.code.replaceAll('-', " "));
+      ShowMessage().showMessage(e.code.replaceAll('-', " "), context);
     }
-  }
-
-  void showErrorMessage(String errorMessage) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              errorMessage,
-              textAlign: TextAlign.center,
-            ),
-          );
-        });
   }
 
   @override
@@ -116,16 +103,24 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10),
 
                 // forgot password?
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ForgotPassPage();
+                    }));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Forgot Password?',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -169,18 +164,16 @@ class _LoginPageState extends State<LoginPage> {
                 // google + apple sign in buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children:   [
+                  children: [
                     // google button
                     SquareTile(
-                      onTap: () => AuthService().signInWithGoogle(),
-                      imagePath: 'lib/images/google.png'),
+                        onTap: () => AuthService().signInWithGoogle(),
+                        imagePath: 'lib/images/google.png'),
 
                     const SizedBox(width: 25),
 
                     // apple button
-                    SquareTile(
-                      onTap: () { },
-                      imagePath: 'lib/images/apple.png')
+                    SquareTile(onTap: () {}, imagePath: 'lib/images/apple.png')
                   ],
                 ),
 
