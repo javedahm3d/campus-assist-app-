@@ -2,9 +2,11 @@ import 'package:campus/components/my_button.dart';
 import 'package:campus/components/my_textfield.dart';
 import 'package:campus/components/square_tile.dart';
 import 'package:campus/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -20,11 +22,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final fullNameController = TextEditingController();
+
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // sign user up method
 
   Future signUserUp() async {
-
     //to show loading screen
     showDialog(
         context: context,
@@ -36,25 +41,34 @@ class _RegisterPageState extends State<RegisterPage> {
 
     //firbase authentication to create new user
 
-    if (passwordController.text == confirmPasswordController.text) {
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim());
- 
-            //pop the loading circle
-            Navigator.pop(context);
+    if (emailController.text.isNotEmpty ||
+        fullNameController.text.isNotEmpty ||
+        passwordController.text.isNotEmpty) {
+      if (passwordController.text == confirmPasswordController.text) {
+        try {
+          await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(
+                  email: emailController.text.trim(),
+                  password: passwordController.text.trim())
+              .then((value) {
+            _firestore.collection('users').doc(value.user!.uid).set({
+              "name": fullNameController.text,
+              "email": emailController.text
+            });
+          });
 
-      } on FirebaseAuthException catch (e) {
-        //pop the loading circle
-        Navigator.pop(context);
-        showErrorMessage(e.code.replaceAll('-', " "));
+          //pop the loading circle
+          Navigator.pop(context);
+        } on FirebaseAuthException catch (e) {
+          //pop the loading circle
+          Navigator.pop(context);
+          showErrorMessage(e.code.replaceAll('-', " "));
+        }
+      } else {
+        //passwords not matching error
+
+        showErrorMessage("Passwords don't match");
       }
-    } 
-    else {
-      //passwords not matching error 
-
-      showErrorMessage("Passwords don't match");
     }
   }
 
@@ -82,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
 
                 // logo
 
@@ -92,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Image.asset('lib/images/app_logo.png'),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
 
                 // welcome back, you've been missed!
                 Text(
@@ -105,7 +119,17 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 25),
 
-                // username textfield
+                //fullname textfield
+                // email textfield
+                MyTextField(
+                  controller: fullNameController,
+                  hintText: 'Full name',
+                  obscureText: false,
+                ),
+
+                const SizedBox(height: 10),
+
+                // email textfield
                 MyTextField(
                   controller: emailController,
                   hintText: 'email id',
@@ -170,18 +194,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 // google + apple sign in buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
+                  children: [
                     // google button
                     SquareTile(
-                      onTap: () => AuthService().signInWithGoogle(),
-                      imagePath: 'lib/images/google.png'),
+                        onTap: () => AuthService().signInWithGoogle(),
+                        imagePath: 'lib/images/google.png'),
 
                     SizedBox(width: 25),
 
                     // apple button
-                    SquareTile(
-                      onTap: () {},
-                      imagePath: 'lib/images/apple.png')
+                    SquareTile(onTap: () {}, imagePath: 'lib/images/apple.png')
                   ],
                 ),
 

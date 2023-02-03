@@ -2,7 +2,7 @@ import 'package:campus/components/my_button.dart';
 import 'package:campus/components/my_textfield.dart';
 import 'package:campus/components/show_message.dart';
 import 'package:campus/components/square_tile.dart';
-import 'package:campus/pages/forgot_pass_page.dart';
+import 'package:campus/login/forgot_pass_page.dart';
 import 'package:campus/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

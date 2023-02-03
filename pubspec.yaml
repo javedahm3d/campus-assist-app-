@@ -38,8 +38,18 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.4.0
   firebase_auth: ^4.2.3
+  cloud_firestore: ^4.3.0
+  firebase_storage: ^11.0.9
+
+
   google_sign_in: ^5.4.2
   provider: ^6.0.5
+  popup_card: ^0.1.0
+  uuid: ^3.0.7
+  file_picker: ^5.2.5
+  percent_indicator: ^4.2.2
+  page_transition: ^2.0.9
+  flutter_lints: ^2.0.1
   
 
 dev_dependencies:
