@@ -50,6 +50,7 @@ dependencies:
   percent_indicator: ^4.2.2
   page_transition: ^2.0.9
   flutter_lints: ^2.0.1
+  intl: ^0.17.0
   
 
 dev_dependencies:

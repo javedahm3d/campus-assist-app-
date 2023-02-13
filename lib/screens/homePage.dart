@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.only(left: 30, top: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children:[
                         Text(
                           'Userame',
                           style: TextStyle(

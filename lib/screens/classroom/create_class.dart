@@ -1,6 +1,7 @@
 import 'package:campus/components/my_button.dart';
 import 'package:campus/components/my_textfield.dart';
 import 'package:campus/components/show_message.dart';
+import 'package:campus/screens/classroom/class_list_page.dart';
 import 'package:campus/screens/classroom/class_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,10 +33,9 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
       final isActive = classNamecontroller.text.isNotEmpty;
 
       setState(() {
-       isButtonActive = isActive;
+        isButtonActive = isActive;
       });
     });
-
   }
 
   @override
@@ -48,6 +48,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
     // String res = 'some error occured';
     var uuid = Uuid();
     String id = uuid.v1();
+    DocumentSnapshot<Map<String, dynamic>> classSnap;
 
     //loading indictor
     showDialog(
@@ -67,6 +68,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
     try {
       // storig class details
       await FirebaseFirestore.instance.collection('classes').doc(id).set({
+        'class id': id,
         'class': classNamecontroller.text,
         'div': divcontroller.text,
         'department': departmentNameController.text,
@@ -78,9 +80,13 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
         'admins': []
       });
 
-      Navigator.pop(context);
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => ClassScreen()));
+      classSnap =
+          await FirebaseFirestore.instance.collection('classes').doc(id).get();
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ClassScreen(snap: classSnap))
+        );
     } catch (e) {
       ShowMessage().showMessage(e.toString().replaceAll('-', ''), context);
     }
@@ -96,7 +102,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
         height: double.infinity,
         child: Column(
           children: [
-            const Image (
+            const Image(
               image: AssetImage('lib/images/app_logo.png'),
               width: 100,
               height: 100,
@@ -104,6 +110,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
             const SizedBox(
               height: 10,
             ),
+
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -111,9 +118,9 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                        BorderRadius.only(topLeft: Radius.circular(30))
-                            .copyWith(topRight: Radius.circular(30))),
-                child: Expanded(
+                       const BorderRadius.only(topLeft: Radius.circular(30))
+                            .copyWith(topRight: const Radius.circular(30))),
+                
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -184,7 +191,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                   ),
                 ),
               ),
-            )
+            
           ],
         ),
       )),

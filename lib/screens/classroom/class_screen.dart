@@ -1,10 +1,13 @@
+import 'package:campus/screens/classroom/classPotCard.dart';
 import 'package:campus/screens/classroom/upload_post_screen.dart';
 import 'package:campus/widgets/my_appbar.dart';
 import 'package:campus/widgets/navigation_drawer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ClassScreen extends StatefulWidget {
-  const ClassScreen({super.key});
+  final snap;
+  const ClassScreen({super.key, this.snap});
 
   @override
   State<ClassScreen> createState() => _ClassScreenState();
@@ -14,10 +17,43 @@ class _ClassScreenState extends State<ClassScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: MyAppBar(),
-        body: Center(
-          child: Text("classroom"),
+        backgroundColor: Colors.grey.shade200,
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
+          backgroundColor: Colors.white,
+          title: Text(
+            widget.snap['class'],
+            style: TextStyle(color: Colors.black),
+          ),
         ),
+        body: Center(
+            child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('classes')
+              .doc(widget.snap['class id'])
+              .collection('class posts').orderBy(
+                'published time' , descending: true
+              )
+              .snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            return (ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                return  ClassPostCard(snap: snapshot.data!.docs[index].data(),);
+              },
+            ));
+          },
+        )
+
+            // child: ClassPostCard()
+            ),
         drawer: NavigationDrawer(),
 
         //floating button
@@ -45,7 +81,9 @@ class _ClassScreenState extends State<ClassScreen> {
                             onTap: () {
                               Navigator.pop(context);
                               Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UploadPostScreen(),
+                                builder: (context) => UploadPostScreen(
+                                    classId: widget.snap['class id'].toString(),
+                                    classname: widget.snap['class'].toString()),
                               ));
                             },
                             child: Text(

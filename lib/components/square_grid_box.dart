@@ -9,7 +9,7 @@ class SquareGridTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         child: InkWell(
           onTap: onTap ,
           child: Container(

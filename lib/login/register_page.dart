@@ -53,7 +53,8 @@ class _RegisterPageState extends State<RegisterPage> {
               .then((value) {
             _firestore.collection('users').doc(value.user!.uid).set({
               "name": fullNameController.text,
-              "email": emailController.text
+              "email": emailController.text,
+              'uid' : value.user!.uid,
             });
           });
 
